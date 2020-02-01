@@ -1,0 +1,20 @@
+{
+    "nombreApp" : "Coal",
+    "rutas" : [
+        {
+            "ruta" : "calendar",
+            "icon" : "calendar_today",
+            "texto" : "Calendario Coal"
+        },
+        {
+            "ruta" : "cita",
+            "icon" : "event",
+            "texto" : "Calendario Coal"
+        },
+        {
+            "ruta" : "logout",
+            "icon" : "exit_to_app",
+            "texto" : "Cerrar Sesión"
+        }
+    ]
+}
