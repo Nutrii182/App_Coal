@@ -29,11 +29,11 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 SizedBox(height: 80.0),
                 _crearEmail(),
-                SizedBox(height: 20.0),
+                SizedBox(height: 30.0),
                 _crearPassword(),
-                SizedBox(height: 40.0),
+                SizedBox(height: 50.0),
                 _crearBoton(context),
-                SizedBox(height: 20.0),
+                SizedBox(height: 30.0),
                 _crearVinculo()
               ],
             ),
@@ -49,7 +49,6 @@ class _LoginPageState extends State<LoginPage> {
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(20.0)),
         labelText: 'Correo',
         hintText: 'Correo Electrónico',
-        helperText: 'Favor de escribir un correo válido',
         suffixIcon: Icon(Icons.alternate_email),
       ),
       validator: (value) =>
@@ -67,7 +66,6 @@ class _LoginPageState extends State<LoginPage> {
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(20.0)),
           labelText: 'Contraseña',
           hintText: 'Contraseña',
-          helperText: 'Mínimo 8 Caractéres',
           suffixIcon: Icon(Icons.lock_open),
         ),
         validator: (value) =>
@@ -97,11 +95,17 @@ class _LoginPageState extends State<LoginPage> {
         RichText(
           text: TextSpan(
             text: 'No tienes una cuenta ',
-            style: TextStyle(fontSize: 15.0, color: Colors.grey),
+            style: TextStyle(fontSize: 16.0, color: Color.fromRGBO(114, 115, 139, 1.0)),
           ),
         ),
         GestureDetector(
-          child: Text('Regístrate', style: TextStyle(decoration: TextDecoration.underline, color: Colors.blue)),
+          child: Text(
+            'Regístrate',
+            style: TextStyle(
+              decoration: TextDecoration.underline,
+              color: Colors.blue,
+              fontSize: 16.0)
+            ),
           onTap: (){
             Navigator.pushNamed(context, 'registro');
           },

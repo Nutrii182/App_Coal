@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "809516151624",
+    "firebase_url": "https://coal-c6cd1.firebaseio.com",
+    "project_id": "coal-c6cd1",
+    "storage_bucket": "coal-c6cd1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:809516151624:android:425abf3250cd475b60b97d",
+        "android_client_info": {
+          "package_name": "com.example.coal"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "809516151624-6600rli862puh8c8q2p0b4mrp2l90ne3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.coal",
+            "certificate_hash": "4affe4924c7ec605e164ae430477b76f1af45a94"
+          }
+        },
+        {
+          "client_id": "809516151624-1no6bmk9ej338m6p24bg0jj7g22nq2ij.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDO5RW_5xgEnC21_AJcoY4vcG1sh7B6wZI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "809516151624-1no6bmk9ej338m6p24bg0jj7g22nq2ij.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
