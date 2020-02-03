@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -14,7 +15,10 @@ class _RegistroPageState extends State<RegistroPage> {
   String _password = '';
   String _repPassword = '';
   String _option = 'Seleccione su género';
-  List<String> _list = ['Seleccione su género', 'Hombre', 'Mujer'];
+  List<String> _list = ['Seleccione su género', 'Masculino', 'Femenino'];
+  bool _stateUser = false;
+  final dbReference = Firestore.instance;
+  final _formkey = GlobalKey<FormState>();
 
   TextEditingController _editName = new TextEditingController();
   TextEditingController _editDate = new TextEditingController();
@@ -28,25 +32,31 @@ class _RegistroPageState extends State<RegistroPage> {
       appBar: AppBar(
         title: Text('Registro'),
       ),
-      body: Container(
-          padding: EdgeInsets.all(20.0),
-          child: ListView(
-            children: <Widget>[
-              _crearNombre(),
-              Divider(),
-              _crearFecha(context),
-              Divider(),
-              _crearDropdown(),
-              Divider(),
-              _crearCorreo(),
-              Divider(),
-              _crearPassword(),
-              Divider(),
-              _crearRepContra(),
-              SizedBox(height: 20.0),
-              _crearBotones()
-            ],
-          )),
+      body: Builder(
+        builder: (context) => Center(
+            child: Form(
+          key: _formkey,
+          child: Container(
+              padding: EdgeInsets.all(20.0),
+              child: ListView(
+                children: <Widget>[
+                  _crearNombre(),
+                  Divider(),
+                  _crearFecha(context),
+                  Divider(),
+                  _crearDropdown(),
+                  Divider(),
+                  _crearCorreo(),
+                  Divider(),
+                  _crearPassword(),
+                  Divider(),
+                  _crearRepContra(),
+                  SizedBox(height: 20.0),
+                  _crearBotones(context)
+                ],
+              )),
+        )),
+      ),
     );
   }
 
@@ -93,7 +103,7 @@ class _RegistroPageState extends State<RegistroPage> {
     DateTime picked = await showDatePicker(
         context: context,
         initialDate: new DateTime.now(),
-        firstDate: new DateTime(2018),
+        firstDate: new DateTime(1950),
         lastDate: new DateTime(2021),
         locale: Locale('es', 'ES'));
 
@@ -197,7 +207,7 @@ class _RegistroPageState extends State<RegistroPage> {
             }));
   }
 
-  Widget _crearBotones() {
+  Widget _crearBotones(BuildContext context) {
     return Row(
       children: <Widget>[
         RaisedButton(
@@ -205,7 +215,38 @@ class _RegistroPageState extends State<RegistroPage> {
             child: Text('Aceptar', style: TextStyle(color: Colors.white)),
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20.0)),
-            onPressed: () {}),
+            onPressed: () {
+              if (_formkey.currentState.validate()) {
+                if (_password != _repPassword) {
+                  Scaffold.of(context).showSnackBar(SnackBar(
+                      backgroundColor: Colors.blue,
+                      content: Text('Las contraseñas no son iguales')));
+                } else {
+                  if (_genero == 'Seleccione su género') {
+                    Scaffold.of(context).showSnackBar(SnackBar(
+                        backgroundColor: Colors.blue,
+                        content: Text('Favor de seleccionar su género')));
+                  } else {
+                    _getData();
+                    Future.delayed(Duration(seconds: 2), () {
+                      if (_stateUser == true) {
+                        Scaffold.of(context).showSnackBar(SnackBar(
+                            backgroundColor: Colors.blue,
+                            content: Text('Usuario Existente')));
+                      } else {
+                        _registraUsuario();
+                        Scaffold.of(context).showSnackBar(SnackBar(
+                            backgroundColor: Colors.blue,
+                            content: Text('Registro Exitoso')));
+                        Future.delayed(Duration(seconds: 2), () {
+                          Navigator.pushNamed(context, 'login');
+                        });
+                      }
+                    });
+                  }
+                }
+              }
+            }),
         SizedBox(width: 15.0),
         RaisedButton(
             color: Colors.blue,
@@ -221,5 +262,31 @@ class _RegistroPageState extends State<RegistroPage> {
             }),
       ],
     );
+  }
+
+  void _registraUsuario() async {
+    return await dbReference.collection("Usuarios").document(_correo).setData({
+      'Nombre': _nombre,
+      'Fecha de Nacimiento': _fecha,
+      'Genero': _genero,
+      'Correo': _correo,
+      'Contraseña': _password
+    });
+
+    // final resp = await dbReference.collection("Usuarios").add({
+    //   'Nombre': _nombre,
+    //   'Fecha de Nacimiento': _fecha,
+    //   'Genero': _genero,
+    //   'Correo': _correo,
+    //   'Contraseña': _password
+    // });
+  }
+
+  void _getData() async {
+    await dbReference.collection("Usuarios").getDocuments().then((val) {
+      for (var i = 0; i < val.documents.length; i++) {
+        if (val.documents[i].data["Correo"] == _correo) _stateUser = true;
+      }
+    });
   }
 }
