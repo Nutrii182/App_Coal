@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -18,6 +19,7 @@ class _RegistroPageState extends State<RegistroPage> {
   List<String> _list = ['Seleccione su género', 'Masculino', 'Femenino'];
   bool _stateUser = false;
   final dbReference = Firestore.instance;
+  FirebaseAuth auth = FirebaseAuth.instance;
   final _formkey = GlobalKey<FormState>();
 
   TextEditingController _editName = new TextEditingController();
@@ -161,8 +163,7 @@ class _RegistroPageState extends State<RegistroPage> {
           helperText: 'Favor de escribir un correo válido',
           suffixIcon: Icon(Icons.alternate_email),
           icon: Icon(Icons.mail)),
-      validator: (value) =>
-          value.isEmpty ? 'El Correo no puede estar vacío' : null,
+      validator: validateEmail,
       onChanged: (v) => setState(() {
         _correo = v;
       }),
@@ -178,11 +179,10 @@ class _RegistroPageState extends State<RegistroPage> {
                 OutlineInputBorder(borderRadius: BorderRadius.circular(20.0)),
             labelText: 'Contraseña',
             hintText: 'Contraseña',
-            helperText: 'Mínimo 8 Caractéres',
+            helperText: 'Mínimo 6 Caractéres',
             suffixIcon: Icon(Icons.lock_open),
             icon: Icon(Icons.lock)),
-        validator: (value) =>
-            value.isEmpty ? 'La Contraseña no puede estar vacía' : null,
+        validator: validatePassword,
         onChanged: (valor) => setState(() {
               _password = valor;
             }));
@@ -197,7 +197,7 @@ class _RegistroPageState extends State<RegistroPage> {
                 OutlineInputBorder(borderRadius: BorderRadius.circular(20.0)),
             labelText: 'Verifica Contraseña',
             hintText: 'Reescribe tu Contraseña',
-            helperText: 'Mínimo 8 Caractéres',
+            helperText: 'Mínimo 6 Caractéres',
             suffixIcon: Icon(Icons.lock_open),
             icon: Icon(Icons.lock)),
         validator: (value) =>
@@ -234,13 +234,20 @@ class _RegistroPageState extends State<RegistroPage> {
                             backgroundColor: Colors.blue,
                             content: Text('Usuario Existente')));
                       } else {
-                        _registraUsuario();
-                        Scaffold.of(context).showSnackBar(SnackBar(
-                            backgroundColor: Colors.blue,
-                            content: Text('Registro Exitoso')));
-                        Future.delayed(Duration(seconds: 2), () {
-                          Navigator.pushNamed(context, 'login');
-                        });
+                        if (_creaUsuario() == null) {
+                          Scaffold.of(context).showSnackBar(SnackBar(
+                              backgroundColor: Colors.blue,
+                              content:
+                                  Text('Error en el Registro')));
+                        } else {
+                          _registraUsuario();
+                          Scaffold.of(context).showSnackBar(SnackBar(
+                              backgroundColor: Colors.blue,
+                              content: Text('Registro Exitoso')));
+                          Future.delayed(Duration(seconds: 2), () {
+                            Navigator.pushNamed(context, 'login');
+                          });
+                        }
                       }
                     });
                   }
@@ -270,16 +277,15 @@ class _RegistroPageState extends State<RegistroPage> {
       'Fecha de Nacimiento': _fecha,
       'Genero': _genero,
       'Correo': _correo,
-      'Contraseña': _password
     });
+  }
 
-    // final resp = await dbReference.collection("Usuarios").add({
-    //   'Nombre': _nombre,
-    //   'Fecha de Nacimiento': _fecha,
-    //   'Genero': _genero,
-    //   'Correo': _correo,
-    //   'Contraseña': _password
-    // });
+  Future<AuthResult> _creaUsuario() async {
+    final regis = await auth.createUserWithEmailAndPassword(
+        email: _correo, password: _password);
+
+    if (regis == null) return null;
+    return regis;
   }
 
   void _getData() async {
@@ -288,5 +294,29 @@ class _RegistroPageState extends State<RegistroPage> {
         if (val.documents[i].data["Correo"] == _correo) _stateUser = true;
       }
     });
+  }
+
+  String validateEmail(String value) {
+    Pattern pattern =
+        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+    RegExp regex = new RegExp(pattern);
+    if (value.isEmpty)
+      return 'El correo no puede estar vacío';
+    else {
+      if (!regex.hasMatch(value))
+        return 'Correo Electrónico Inválido';
+      else
+        return null;
+    }
+  }
+
+  String validatePassword(String value) {
+    if (value.isEmpty)
+      return 'La contraseña no puede estar vacía';
+    else {
+      if (value.length < 6)
+        return 'La contraseña debe tener mínimo 6 caractéres';
+    }
+    return null;
   }
 }
