@@ -19,7 +19,7 @@ class _RegistroPageState extends State<RegistroPage> {
   List<String> _list = ['Seleccione su género', 'Masculino', 'Femenino'];
   bool _stateUser = false;
   final dbReference = Firestore.instance;
-  FirebaseAuth auth = FirebaseAuth.instance;
+  FirebaseAuth _auth = FirebaseAuth.instance;
   final _formkey = GlobalKey<FormState>();
 
   TextEditingController _editName = new TextEditingController();
@@ -281,7 +281,7 @@ class _RegistroPageState extends State<RegistroPage> {
   }
 
   Future<AuthResult> _creaUsuario() async {
-    final regis = await auth.createUserWithEmailAndPassword(
+    final regis = await _auth.createUserWithEmailAndPassword(
         email: _correo, password: _password);
 
     if (regis == null) return null;

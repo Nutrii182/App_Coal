@@ -11,7 +11,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   String _email = '';
   String _password = '';
-  FirebaseAuth auth = FirebaseAuth.instance;
+  FirebaseAuth _auth = FirebaseAuth.instance;
   final _formkey = GlobalKey<FormState>();
 
   @override
@@ -89,11 +89,12 @@ class _LoginPageState extends State<LoginPage> {
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
         onPressed: () async {
+          //Navigator.pushNamed(context, 'calendar');
           if (_formkey.currentState.validate()) {
             try {
-              await auth.signInWithEmailAndPassword(
+              await _auth.signInWithEmailAndPassword(
                   email: _email, password: _password);
-              await Navigator.pushNamed(context, 'calendar');
+              await Navigator.pushReplacementNamed(context, 'calendar');
             } catch (e) {
               print("Error Iniciando Sesion: $e");
               String exception = getExceptionText(e);
@@ -101,7 +102,8 @@ class _LoginPageState extends State<LoginPage> {
                   backgroundColor: Colors.blue, content: Text(exception)));
             }
           }
-        });
+        }
+      );
   }
 
   Widget _crearVinculo() {

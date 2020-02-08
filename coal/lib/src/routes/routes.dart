@@ -1,4 +1,5 @@
 
+import 'package:coal/src/pages/info_page.dart';
 import 'package:coal/src/pages/registro_page.dart';
 import 'package:flutter/material.dart';
 import 'package:coal/src/pages/cita_page.dart';
@@ -11,6 +12,7 @@ Map<String, WidgetBuilder> getApplicationsRoutes(){
     'login' : (BuildContext context) => LoginPage(),
     'calendar' : (BuildContext context) => CalendarPage(),
     'cita' : (BuildContext context) => CitaPage(),
+    'info' : (BuildContext context) => InfoPage(),
     'registro' : (BuildContext context) => RegistroPage()
   };
 }
