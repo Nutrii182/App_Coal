@@ -44,7 +44,6 @@ class DrawerWidget extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.exit_to_app, color: Colors.lightBlue),
             title: Text('Cerrar Sesión', style: TextStyle(color: Colors.lightBlue)),
-            trailing: Icon(Icons.keyboard_arrow_right, color: Colors.lightBlue),
             onTap: () async {
               await _auth.signOut();
               await Navigator.pushReplacementNamed(context, 'login');

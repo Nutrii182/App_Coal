@@ -1,7 +1,9 @@
 import 'dart:ui';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:coal/src/shared/preferences_user.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -12,7 +14,9 @@ class _LoginPageState extends State<LoginPage> {
   String _email = '';
   String _password = '';
   FirebaseAuth _auth = FirebaseAuth.instance;
+  final dbReference = Firestore.instance;
   final _formkey = GlobalKey<FormState>();
+  final pref = new PreferencesUser();
 
   @override
   Widget build(BuildContext context) {
@@ -89,11 +93,11 @@ class _LoginPageState extends State<LoginPage> {
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
         onPressed: () async {
-          //Navigator.pushNamed(context, 'calendar');
           if (_formkey.currentState.validate()) {
             try {
               await _auth.signInWithEmailAndPassword(
                   email: _email, password: _password);
+              _setStorage();
               await Navigator.pushReplacementNamed(context, 'calendar');
             } catch (e) {
               print("Error Iniciando Sesion: $e");
@@ -128,6 +132,16 @@ class _LoginPageState extends State<LoginPage> {
         )
       ],
     );
+  }
+
+  void _setStorage() async {
+
+    await dbReference.collection("Usuarios").document(_email).get().then((value){
+      pref.name = value.data['Nombre'];
+      pref.date = value.data['Fecha de Nacimiento'];
+      pref.gender = value.data['Genero'];
+      pref.email = value.data['Correo'];
+    });
   }
 
   String validateEmail(String value) {

@@ -1,11 +1,17 @@
 
+import 'package:flutter/material.dart';
 import 'package:coal/src/pages/login_page.dart';
 import 'package:coal/src/routes/routes.dart';
-import 'package:flutter/material.dart';
+import 'package:coal/src/shared/preferences_user.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
  
-void main() => runApp(MyApp());
- 
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final pref = new PreferencesUser();
+  await pref.initPref();
+  runApp(MyApp());
+}
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
