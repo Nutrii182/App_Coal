@@ -26,8 +26,16 @@ class DrawerWidget extends StatelessWidget {
             title: Text('Información Personal', style: TextStyle(color: Colors.lightBlue)),
             trailing: Icon(Icons.keyboard_arrow_right, color: Colors.lightBlue),
             onTap: () {
-              Navigator.pop(context);
-              Navigator.pushNamed(context, 'info');
+              Navigator.pushReplacementNamed(context, 'info');
+            },
+          ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.event_note, color: Colors.lightBlue),
+            title: Text('Solicitar Cita', style: TextStyle(color: Colors.lightBlue)),
+            trailing: Icon(Icons.keyboard_arrow_right, color: Colors.lightBlue),
+            onTap: () {
+              Navigator.pushReplacementNamed(context, 'cita');
             },
           ),
           Divider(),
@@ -36,8 +44,7 @@ class DrawerWidget extends StatelessWidget {
             title: Text('Calendario', style: TextStyle(color: Colors.lightBlue)),
             trailing: Icon(Icons.keyboard_arrow_right, color: Colors.lightBlue),
             onTap: () {
-              Navigator.pop(context);
-              Navigator.pushNamed(context, 'calendar');
+              Navigator.pushReplacementNamed(context, 'calendar');
             },
           ),
           Divider(),

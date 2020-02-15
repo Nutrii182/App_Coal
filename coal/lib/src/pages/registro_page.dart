@@ -106,7 +106,7 @@ class _RegistroPageState extends State<RegistroPage> {
         context: context,
         initialDate: new DateTime.now(),
         firstDate: new DateTime(1950),
-        lastDate: new DateTime(2021),
+        lastDate: new DateTime.now(),
         locale: Locale('es', 'ES'));
 
     if (picked != null) {
@@ -245,7 +245,8 @@ class _RegistroPageState extends State<RegistroPage> {
                               backgroundColor: Colors.blue,
                               content: Text('Registro Exitoso')));
                           Future.delayed(Duration(seconds: 2), () {
-                            Navigator.pushNamed(context, 'login');
+                            Navigator.pop(context);
+                            Navigator.pushReplacementNamed(context, 'login');
                           });
                         }
                       }

@@ -1,5 +1,6 @@
 import 'package:coal/src/widgets/drawer.dart';
 import 'package:flutter/material.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class CalendarPage extends StatefulWidget {
   @override
@@ -7,14 +8,55 @@ class CalendarPage extends StatefulWidget {
 }
 
 class _CalendarPageState extends State<CalendarPage> {
+
+  // Map<DateTime, List> _events;
+  // final _selectedDay = DateTime.now();
+  // List _selectedEvents;
+  CalendarController _calendarController;
+
+  @override
+  void initState() {
+    super.initState();
+    _calendarController = CalendarController();
+  }
+
+  @override
+  void dispose() {
+    _calendarController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: DrawerWidget(),
       appBar: AppBar(title: Text('Calendario Coal')),
-      body: Center(
-        child: Text('Body Calendar'),
-      ),
+      body: Container(
+        child: TableCalendar(
+          locale: 'es-MX',
+          formatAnimation: FormatAnimation.slide,
+          calendarController: _calendarController,
+          startingDayOfWeek: StartingDayOfWeek.monday,
+          headerStyle: HeaderStyle(
+            centerHeaderTitle: true,
+            formatButtonVisible: false
+          ),
+          calendarStyle: CalendarStyle(
+            holidayStyle: TextStyle().copyWith(color: Colors.red),
+            weekendStyle: TextStyle().copyWith(color: Colors.deepOrange)
+          ),
+          daysOfWeekStyle: DaysOfWeekStyle(
+            weekendStyle: TextStyle().copyWith(color: Colors.deepOrange),
+          ),
+          onDaySelected: _onDaySelected,
+        )
+      )
     );
+  }
+
+  void _onDaySelected(DateTime day, List events) {
+    setState(() {
+      
+    });
   }
 }
