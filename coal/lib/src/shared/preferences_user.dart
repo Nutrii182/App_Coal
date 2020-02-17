@@ -47,4 +47,12 @@ class PreferencesUser {
   set email(String value){
     _pref.setString('Correo', value);
   }
+
+  get lastPage{
+    return _pref.getString('UltimaPagina') ?? null;
+  }
+
+  set lastPage(String value){
+    _pref.setString('UltimaPagina', value);
+  }
 }

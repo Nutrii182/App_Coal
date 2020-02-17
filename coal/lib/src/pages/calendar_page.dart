@@ -1,6 +1,7 @@
+import 'package:coal/src/shared/preferences_user.dart';
+import 'package:table_calendar/table_calendar.dart';
 import 'package:coal/src/widgets/drawer.dart';
 import 'package:flutter/material.dart';
-import 'package:table_calendar/table_calendar.dart';
 
 class CalendarPage extends StatefulWidget {
   @override
@@ -13,6 +14,7 @@ class _CalendarPageState extends State<CalendarPage> {
   // final _selectedDay = DateTime.now();
   // List _selectedEvents;
   CalendarController _calendarController;
+  final pref = new PreferencesUser();
 
   @override
   void initState() {
@@ -28,6 +30,9 @@ class _CalendarPageState extends State<CalendarPage> {
 
   @override
   Widget build(BuildContext context) {
+
+    pref.lastPage = 'calendar';
+
     return Scaffold(
       drawer: DrawerWidget(),
       appBar: AppBar(title: Text('Calendario Coal')),

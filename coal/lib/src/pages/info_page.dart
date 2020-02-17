@@ -16,6 +16,8 @@ class _InfoPageState extends State<InfoPage> {
   @override
   Widget build(BuildContext context) {
 
+    pref.lastPage = 'info';
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Información Personal'),
