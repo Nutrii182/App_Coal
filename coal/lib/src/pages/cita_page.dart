@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:coal/src/shared/preferences_user.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:coal/src/widgets/drawer.dart';
@@ -16,6 +17,8 @@ class _CitaPageState extends State<CitaPage> {
   String _motivo;
   String _fecha;
   DateTime _beginTime;
+  bool _band = false;
+  final dbReference = Firestore.instance;
   DateTime _entrada = DateTime.parse('1970-01-01 09:00:00.000');
   DateTime _salida = DateTime.parse('1970-01-01 19:00:00.000');
   TextEditingController _editDate = new TextEditingController();
@@ -141,13 +144,29 @@ class _CitaPageState extends State<CitaPage> {
                   backgroundColor: Colors.blue,
                   content: Text('No puede haber algún campo vacío')));
 						} else{
-							if(_entrada.isAfter(_beginTime) || _beginTime == DateTime.now()
-              || _validaInicio() || _beginTime.isAfter(_salida)){
+							if(_validaInicio() || _beginTime.isAfter(_salida) || _beginTime.isBefore(_entrada)){
 								Scaffold.of(context).showSnackBar(SnackBar(
 										backgroundColor: Colors.blue,
 										content: Text('Los Horarios son Inválidos')));
               } else{
-                  _sendEmail();
+                  _validaCita();
+                  Future.delayed(Duration(seconds: 2), () {
+                    if(_band == true){
+                      Scaffold.of(context).showSnackBar(SnackBar(
+										backgroundColor: Colors.blue,
+										content: Text('El horario esta ocupado')));
+                    } else{
+                      _sendEmail();
+                      _registraCita();
+                      Scaffold.of(context).showSnackBar(SnackBar(
+                      backgroundColor: Colors.blue,
+                      content: Text('Se solicitó la cita exitósamente')));
+                      Future.delayed(Duration(seconds: 2), () {
+                        Navigator.pushReplacementNamed(context, 'calendar');
+                        });
+                    }
+                  }
+                );
               }
 						}
           }),
@@ -165,40 +184,59 @@ class _CitaPageState extends State<CitaPage> {
 
   bool _validaInicio(){
 
-    DateTime _v = DateTime.now();
-    DateTime _u = _beginTime;
+    DateTime _hoy = DateTime.now();
+    DateTime _cita = _beginTime;
 
-    String m = DateFormat("HH:mm").format(_v);
-    String n = DateFormat("HH:mm").format(_u);
+    String m = DateFormat("HH:mm").format(_hoy);
+    String n = DateFormat("HH:mm").format(_cita);
  
     final hora = m.substring(0).split(':');
     final i = hora[0];
     final j = hora[1];
     
-    _v = DateTime.utc(1970,01,01,int.parse(i),int.parse(j));
+    _hoy = DateTime.utc(1970,01,01,int.parse(i),int.parse(j));
 
     final hora1 = n.substring(0).split(':');
     final i1 = hora1[0];
     final j1 = hora1[1];
 
-    _u = DateTime.utc(1970,01,01,int.parse(i1),int.parse(j1));
+    _cita = DateTime.utc(1970,01,01,int.parse(i1),int.parse(j1));
 
-    if(_u.isBefore(_v))
-      return false;
-    return true;
+    if(_cita.isBefore(_hoy))
+      return true;
+    return false;
+  }
+
+  Future<void> _registraCita() async {
+
+    return await dbReference.collection("Usuarios").document(pref.email).collection("Citas").add({
+      'Fecha': _fecha,
+      'Hora': _beginTime,
+      'Motivo': _motivo,
+      'Bandera': false,
+    });
+  }
+
+  void _validaCita() async {
+    await dbReference.collection("Usuarios").document(pref.email).collection("Cita").getDocuments().then((val){
+      for (var i = 0; i < val.documents.length; i++) {
+        if(val.documents[i].data['Fecha'] == _fecha && val.documents[i].data['Hora'] == _beginTime)
+        _band = true;
+      }
+    });
   }
 
   void _sendEmail() async {
 
     String _s1 = DateFormat("HH:mm").format(_beginTime);
-    String _user = "odont.coal@gmail.com";
-    String _password = "CentroCoal";
+    String _user = "nutrii182@gmail.com";
+    String _password = "Nutriiburra182";
 
     final smtpServer = gmail(_user, _password);
 
     final _message = Message()
       ..from = Address(_user, 'Sistema COAL')
-      ..recipients.add('nutrii182@gmail.com')
+      ..recipients.add('abraham_3.1416@hotmail.com')
       ..subject = 'Solicitud de Cita'
       ..text = 'Envío de Avisos mediante correo electrónico'
       ..html = '<h2>Solicitud de Cita</h2><p>El usuario ${pref.email} de nombre ${pref.name} solicitó una cita el día $_fecha a las $_s1 con motivo de $_motivo</p><br><p>Desea aceptarla cita especificada anteriormente..</p>';
