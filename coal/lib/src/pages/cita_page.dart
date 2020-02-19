@@ -16,6 +16,7 @@ class _CitaPageState extends State<CitaPage> {
 
   String _motivo;
   String _fecha;
+  DateTime temp;
   DateTime _beginTime;
   bool _band = false;
   final dbReference = Firestore.instance;
@@ -30,26 +31,28 @@ class _CitaPageState extends State<CitaPage> {
     pref.lastPage = 'cita';
 
     return Scaffold(
-        drawer: DrawerWidget(),
-        appBar: AppBar(title: Text('Solicitar Cita')),
-        body: Builder(
-            builder: (context) => Center(
-                  child: Container(
-                      padding: EdgeInsets.all(20.0),
-                      child: ListView(
-                          children: <Widget>[
-                            _createReason(context),
-                            Divider(),
-                            _createDate(context),
-                            Divider(),
-                            _createBeginTime(context),
-                            Divider(),
-                            SizedBox(height: 20.0),
-                            _createButtons(context)
-                          ],
-                        ),
-                      )),
-                ));
+      drawer: DrawerWidget(),
+      appBar: AppBar(title: Text('Solicitar Cita')),
+      body: Builder(
+        builder: (context) => Center(
+            child: Container(
+              padding: EdgeInsets.all(20.0),
+              child: ListView(
+                children: <Widget>[
+                _createReason(context),
+                Divider(),
+                _createDate(context),
+                Divider(),
+                _createBeginTime(context),
+                Divider(),
+                SizedBox(height: 20.0),
+                _createButtons(context)
+              ],
+            ),
+          )
+        ),
+      )
+    );
   }
 
   Widget _createReason(BuildContext context){
@@ -101,6 +104,7 @@ class _CitaPageState extends State<CitaPage> {
 
     if (picked != null) {
       setState(() {
+        temp = picked;
         _dateFormat = DateFormat("dd/MM/yyyy").format(picked);
         _editDate.text = _dateFormat;
         _fecha = _dateFormat;
@@ -160,10 +164,10 @@ class _CitaPageState extends State<CitaPage> {
                       _registraCita();
                       Scaffold.of(context).showSnackBar(SnackBar(
                       backgroundColor: Colors.blue,
-                      content: Text('Se solicitó la cita exitósamente')));
+                      content: Text('Se solicitó la cita correctamente')));
                       Future.delayed(Duration(seconds: 2), () {
                         Navigator.pushReplacementNamed(context, 'calendar');
-                        });
+                      });
                     }
                   }
                 );
@@ -202,26 +206,34 @@ class _CitaPageState extends State<CitaPage> {
 
     _cita = DateTime.utc(1970,01,01,int.parse(i1),int.parse(j1));
 
-    if(_cita.isBefore(_hoy))
+    if(_cita.isBefore(_hoy) && temp.isBefore(DateTime.now()))
       return true;
     return false;
   }
 
   Future<void> _registraCita() async {
 
-    return await dbReference.collection("Usuarios").document(pref.email).collection("Citas").add({
+    final _dateFormat = DateFormat("HH:mm").format(_beginTime);
+
+    return await dbReference.collection("Citas").add({
+      'Nombre': pref.name,
+      'Usuario': pref.email,
       'Fecha': _fecha,
-      'Hora': _beginTime,
+      'Hora': _dateFormat,
       'Motivo': _motivo,
-      'Bandera': false,
+      'Estado': false,
     });
   }
 
   void _validaCita() async {
-    await dbReference.collection("Usuarios").document(pref.email).collection("Cita").getDocuments().then((val){
+
+    final temp = DateFormat("HH:mm").format(_beginTime);
+
+    await dbReference.collection("Citas").getDocuments().then((val){
       for (var i = 0; i < val.documents.length; i++) {
-        if(val.documents[i].data['Fecha'] == _fecha && val.documents[i].data['Hora'] == _beginTime)
-        _band = true;
+        if(val.documents[i].data["Fecha"] == _fecha && val.documents[i].data["Hora"] == temp){
+          _band = true;
+        }
       }
     });
   }
@@ -229,17 +241,17 @@ class _CitaPageState extends State<CitaPage> {
   void _sendEmail() async {
 
     String _s1 = DateFormat("HH:mm").format(_beginTime);
-    String _user = "nutrii182@gmail.com";
-    String _password = "Nutriiburra182";
+    String _user = "odont.coal@gmail.com";
+    String _password = "CentroCoal";
 
     final smtpServer = gmail(_user, _password);
 
     final _message = Message()
       ..from = Address(_user, 'Sistema COAL')
-      ..recipients.add('abraham_3.1416@hotmail.com')
+      ..recipients.add('nart182@yahoo.com.mx')
       ..subject = 'Solicitud de Cita'
       ..text = 'Envío de Avisos mediante correo electrónico'
-      ..html = '<h2>Solicitud de Cita</h2><p>El usuario ${pref.email} de nombre ${pref.name} solicitó una cita el día $_fecha a las $_s1 con motivo de $_motivo</p><br><p>Desea aceptarla cita especificada anteriormente..</p>';
+      ..html = '<h2>Solicitud de Cita</h2><p>El usuario ${pref.email} de nombre ${pref.name} solicitó una cita el día $_fecha a las $_s1 con motivo de $_motivo</p><br><p>Desea aceptar la cita especificada anteriormente..</p>';
 
     try{
       final sendMail = await send(_message, smtpServer);
