@@ -31,11 +31,20 @@ class DrawerWidget extends StatelessWidget {
           ),
           Divider(),
           ListTile(
-            leading: Icon(Icons.event_note, color: Colors.lightBlue),
+            leading: Icon(Icons.event_available, color: Colors.lightBlue),
             title: Text('Solicitar Cita', style: TextStyle(color: Colors.lightBlue)),
             trailing: Icon(Icons.keyboard_arrow_right, color: Colors.lightBlue),
             onTap: () {
               Navigator.pushReplacementNamed(context, 'cita');
+            },
+          ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.event_busy, color: Colors.lightBlue),
+            title: Text('Cancelar Cita', style: TextStyle(color: Colors.lightBlue)),
+            trailing: Icon(Icons.keyboard_arrow_right, color: Colors.lightBlue),
+            onTap: () {
+            Navigator.pushReplacementNamed(context, 'cancelar');
             },
           ),
           Divider(),
@@ -47,7 +56,6 @@ class DrawerWidget extends StatelessWidget {
               Navigator.pushReplacementNamed(context, 'calendar');
             },
           ),
-          Divider(),
           ListTile(
             leading: Icon(Icons.exit_to_app, color: Colors.lightBlue),
             title: Text('Cerrar Sesión', style: TextStyle(color: Colors.lightBlue)),
@@ -56,7 +64,6 @@ class DrawerWidget extends StatelessWidget {
               await Navigator.pushReplacementNamed(context, 'login');
             },
           ),
-          Divider(),
         ],
       ),
     );

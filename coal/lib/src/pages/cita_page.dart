@@ -14,10 +14,8 @@ class CitaPage extends StatefulWidget {
 
 class _CitaPageState extends State<CitaPage> {
 
-  String _motivo;
-  String _fecha;
-  DateTime temp;
-  DateTime _beginTime;
+  String _motivo, _fecha;
+  DateTime temp, _beginTime;
   bool _band = false;
   final dbReference = Firestore.instance;
   DateTime _entrada = DateTime.parse('1970-01-01 09:00:00.000');
