@@ -9,13 +9,8 @@ class RegistroPage extends StatefulWidget {
 }
 
 class _RegistroPageState extends State<RegistroPage> {
-  String _nombre = '';
-  String _fecha = '';
-  String _genero = '';
-  String _correo = '';
-  String _password = '';
-  String _repPassword = '';
-  String _option = 'Seleccione su género';
+  String _nombre = '', _fecha = '', _genero = '', _correo = '';
+  String _password = '', _repPassword = '', _option = 'Seleccione su género';
   List<String> _list = ['Seleccione su género', 'Masculino', 'Femenino'];
   bool _stateUser = false;
   final dbReference = Firestore.instance;
@@ -273,11 +268,13 @@ class _RegistroPageState extends State<RegistroPage> {
   }
 
   void _registraUsuario() async {
+
     return await dbReference.collection("Usuarios").document(_correo).setData({
       'Nombre': _nombre,
       'Fecha de Nacimiento': _fecha,
       'Genero': _genero,
       'Correo': _correo,
+      'Token' : '',
     });
   }
 

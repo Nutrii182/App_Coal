@@ -1,6 +1,8 @@
 import 'package:coal/src/shared/preferences_user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:coal/src/shared/cita_class.dart';
 import 'package:coal/src/widgets/drawer.dart';
 import 'package:flutter/material.dart';
 
@@ -10,8 +12,8 @@ class CalendarPage extends StatefulWidget {
 }
 
 class _CalendarPageState extends State<CalendarPage> {
-  String _conca = "";
-  Map<DateTime, List<dynamic>> _events;
+  Cita _cita;
+  Map<DateTime, List<Cita>> _events;
   List<dynamic> _selectedEvents;
   CalendarController _calendarController;
   final dbReference = Firestore.instance;
@@ -24,22 +26,7 @@ class _CalendarPageState extends State<CalendarPage> {
     _events = {};
     _selectedEvents = [];
     _getEvents();
-  }
-
-  Map<String, dynamic> encodeMap(Map<DateTime, dynamic> map) {
-    Map<String, dynamic> newMap = {};
-    map.forEach((key, value) {
-      newMap[key.toString()] = map[key];
-    });
-    return newMap;
-  }
-
-  Map<DateTime, dynamic> decodeMap(Map<String, dynamic> map) {
-    Map<DateTime, dynamic> newMap = {};
-    map.forEach((key, value) {
-      newMap[DateTime.parse(key)] = map[key];
-    });
-    return newMap;
+    _getToken();
   }
 
   @override
@@ -97,14 +84,33 @@ class _CalendarPageState extends State<CalendarPage> {
                 ),
               ),
             ),
-            ..._selectedEvents.map((event) => ListTile(
-                  leading: Icon(Icons.event),
-                  title: Text(event),
-                ))
+            ..._selectedEvents.map((event) {
+              return _showEvents(event);
+            })
           ],
         ),
       ),
     );
+  }
+
+  void _getToken() async {
+    String _token;
+
+    final user = await FirebaseAuth.instance.currentUser();
+    final idToken = await user.getIdToken();
+    _token = idToken.token;
+    _updateToken(_token);
+  }
+
+  void _updateToken(String token) {
+    try {
+      dbReference
+          .collection('Usuarios')
+          .document(pref.email)
+          .updateData({'Token': token});
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
   DateTime _convierteFecha(String fecha) {
@@ -122,13 +128,39 @@ class _CalendarPageState extends State<CalendarPage> {
 
     setState(() {
       items.forEach((v) {
-        _conca = "Cita " + " " + v["Hora"];
-        if(_events[_convierteFecha(v['Fecha'])] != null)
-          _events[_convierteFecha(v['Fecha'])].add(_conca);
+        _cita = Cita(v['Nombre'], v['Usuario'], v['Motivo'], v['Fecha'],
+            v['Hora'], v['Estado']);
+        if (_events[_convierteFecha(_cita.fecha)] != null)
+          _events[_convierteFecha(_cita.fecha)].add(_cita);
         else
-          _events[_convierteFecha(v['Fecha'])] = [_conca];
+          _events[_convierteFecha(_cita.fecha)] = [_cita];
       });
     });
+    return _events;
   }
 
+  Widget _showEvents(dynamic event) {
+    if (event.estado == 'En Espera') {
+      return ListTile(
+        leading: Icon(Icons.event),
+        title: Text("Cita ${event.hora}"),
+        subtitle: Text('En Espera'),
+      );
+    } else {
+      if (event.estado == 'Aceptada') {
+        return ListTile(
+          leading: Icon(Icons.event_available, color: Colors.blue),
+          title: Text("Cita ${event.hora}"),
+          subtitle: Text('Aceptada', style: TextStyle(color: Colors.blue)),
+        );
+      } else {
+        return ListTile(
+          leading: Icon(Icons.event_busy, color: Colors.red),
+          title: Text("Cita ${event.hora}"),
+          subtitle:
+              Text('Cancelada', style: TextStyle(color: Colors.redAccent)),
+        );
+      }
+    }
+  }
 }

@@ -1,11 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:coal/src/shared/preferences_user.dart';
+import 'package:coal/src/shared/cita_class.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'package:coal/src/shared/preferences_user.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:coal/src/widgets/drawer.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
+import 'package:flutter/material.dart';
+import 'package:mailer/mailer.dart';
+import 'package:intl/intl.dart';
 
 class CitaPage extends StatefulWidget {
   @override
@@ -17,6 +18,7 @@ class _CitaPageState extends State<CitaPage> {
   String _motivo, _fecha;
   DateTime temp, _beginTime;
   bool _band = false;
+  Cita _cita;
   final dbReference = Firestore.instance;
   DateTime _entrada = DateTime.parse('1970-01-01 09:00:00.000');
   DateTime _salida = DateTime.parse('1970-01-01 19:00:00.000');
@@ -184,6 +186,7 @@ class _CitaPageState extends State<CitaPage> {
     ]);
   }
 
+
   bool _validaInicio(){
 
     DateTime _hoy = DateTime.now();
@@ -212,14 +215,15 @@ class _CitaPageState extends State<CitaPage> {
   Future<void> _registraCita() async {
 
     final _dateFormat = DateFormat("HH:mm").format(_beginTime);
+    _cita = Cita(pref.name, pref.email,_motivo,_fecha,_dateFormat,'En Espera');
 
     return await dbReference.collection("Citas").add({
-      'Nombre': pref.name,
-      'Usuario': pref.email,
-      'Fecha': _fecha,
-      'Hora': _dateFormat,
-      'Motivo': _motivo,
-      'Estado': false,
+      'Nombre': _cita.nombre,
+      'Usuario': _cita.usuario,
+      'Fecha': _cita.fecha,
+      'Hora': _cita.hora,
+      'Motivo': _cita.motivo,
+      'Estado': _cita.estado,
     });
   }
 

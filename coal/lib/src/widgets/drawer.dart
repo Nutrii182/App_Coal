@@ -56,6 +56,7 @@ class DrawerWidget extends StatelessWidget {
               Navigator.pushReplacementNamed(context, 'calendar');
             },
           ),
+          Divider(),
           ListTile(
             leading: Icon(Icons.exit_to_app, color: Colors.lightBlue),
             title: Text('Cerrar Sesión', style: TextStyle(color: Colors.lightBlue)),
@@ -64,6 +65,7 @@ class DrawerWidget extends StatelessWidget {
               await Navigator.pushReplacementNamed(context, 'login');
             },
           ),
+          Divider()
         ],
       ),
     );

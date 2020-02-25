@@ -24,22 +24,26 @@ class _InfoPageState extends State<InfoPage> {
       ),
       drawer: DrawerWidget(),
       body: Container(
-        padding: EdgeInsets.all(20.0),
-        child: ListView(
+        padding: EdgeInsets.only(top: 20.0),
+        child: Column(
           children: <Widget>[
             ListTile(
+              leading: Icon(Icons.account_box, color: Colors.blue),
               title: Text('Nombre: ${pref.name}'),
             ),
             Divider(),
             ListTile(
+              leading: Icon(Icons.cake, color: Colors.blue),
               title: Text('Fecha de Nacimiento: ${pref.date}'),
             ),
             Divider(),
             ListTile(
+              leading: Icon(Icons.person, color: Colors.blue),
               title: Text('Género: ${pref.gender}'),
             ),
             Divider(),
             ListTile(
+              leading: Icon(Icons.email, color: Colors.blue),
               title: Text('Correo: ${pref.email}'),
             ),
           ],
