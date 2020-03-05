@@ -13,7 +13,7 @@ Map<String, WidgetBuilder> getApplicationsRoutes(){
     'login' : (BuildContext context) => LoginPage(),
     'calendar' : (BuildContext context) => CalendarPage(),
     'cita' : (BuildContext context) => CitaPage(),
-    'cancelar': (BuildContext context) => CancelaCitaPage(),
+    'cancela': (BuildContext context) => CancelaCitaPage(),
     'info' : (BuildContext context) => InfoPage(),
     'registro' : (BuildContext context) => RegistroPage()
   };

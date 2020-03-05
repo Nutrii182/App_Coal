@@ -11,8 +11,8 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  String _email = '';
-  String _password = '';
+  String _email = '', _password = '';
+  bool _isLoading = false;
   FirebaseAuth _auth = FirebaseAuth.instance;
   final dbReference = Firestore.instance;
   final _formkey = GlobalKey<FormState>();
@@ -44,7 +44,13 @@ class _LoginPageState extends State<LoginPage> {
                     SizedBox(height: 50.0),
                     _crearBoton(context),
                     SizedBox(height: 30.0),
-                    _crearVinculo()
+                    Column(
+                      children: <Widget>[
+                        _loading()
+                      ],
+                    ),
+                    SizedBox(height: 10.0),
+                    _crearVinculo(),
                   ],
                 ),
               ),
@@ -93,21 +99,32 @@ class _LoginPageState extends State<LoginPage> {
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
         onPressed: () async {
+          setState(() {
+            _isLoading = true;
+          });
           if (_formkey.currentState.validate()) {
             try {
               await _auth.signInWithEmailAndPassword(
                   email: _email, password: _password);
               _setStorage();
+              setState(() {
+                _isLoading = false;
+              });
               await Navigator.pushReplacementNamed(context, 'calendar');
             } catch (e) {
               print("Error Iniciando Sesion: $e");
               String exception = getExceptionText(e);
               Scaffold.of(context).showSnackBar(SnackBar(
                   backgroundColor: Colors.blue, content: Text(exception)));
+              setState(() {
+                _isLoading = false;
+              });
             }
-          }
-        }
-      );
+          }else
+            setState(() {
+                _isLoading = false;
+              });
+        });
   }
 
   Widget _crearVinculo() {
@@ -134,9 +151,19 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  void _setStorage() async {
+  Widget _loading() {
+    if (_isLoading == true)
+      return CircularProgressIndicator();
+    else
+      return Container();
+  }
 
-    await dbReference.collection("Usuarios").document(_email).get().then((value){
+  void _setStorage() async {
+    await dbReference
+        .collection("Usuarios")
+        .document(_email)
+        .get()
+        .then((value) {
       pref.name = value.data['Nombre'];
       pref.date = value.data['Fecha de Nacimiento'];
       pref.gender = value.data['Genero'];

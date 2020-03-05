@@ -12,7 +12,7 @@ class _RegistroPageState extends State<RegistroPage> {
   String _nombre = '', _fecha = '', _genero = '', _correo = '';
   String _password = '', _repPassword = '', _option = 'Seleccione su género';
   List<String> _list = ['Seleccione su género', 'Masculino', 'Femenino'];
-  bool _stateUser = false;
+  bool _stateUser = false, _isLoading = false;
   final dbReference = Firestore.instance;
   FirebaseAuth _auth = FirebaseAuth.instance;
   final _formkey = GlobalKey<FormState>();
@@ -211,16 +211,25 @@ class _RegistroPageState extends State<RegistroPage> {
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20.0)),
             onPressed: () {
+              setState(() {
+                _isLoading = true;
+              });
               if (_formkey.currentState.validate()) {
                 if (_password != _repPassword) {
                   Scaffold.of(context).showSnackBar(SnackBar(
                       backgroundColor: Colors.blue,
                       content: Text('Las contraseñas no son iguales')));
+                  setState(() {
+                    _isLoading = false;
+                  });
                 } else {
                   if (_genero == 'Seleccione su género') {
                     Scaffold.of(context).showSnackBar(SnackBar(
                         backgroundColor: Colors.blue,
                         content: Text('Favor de seleccionar su género')));
+                    setState(() {
+                      _isLoading = false;
+                    });
                   } else {
                     _getData();
                     Future.delayed(Duration(seconds: 2), () {
@@ -228,19 +237,26 @@ class _RegistroPageState extends State<RegistroPage> {
                         Scaffold.of(context).showSnackBar(SnackBar(
                             backgroundColor: Colors.blue,
                             content: Text('Usuario Existente')));
+                        setState(() {
+                          _isLoading = false;
+                        });
                       } else {
                         if (_creaUsuario() == null) {
                           Scaffold.of(context).showSnackBar(SnackBar(
                               backgroundColor: Colors.blue,
-                              content:
-                                  Text('Error en el Registro')));
+                              content: Text('Error en el Registro')));
+                          setState(() {
+                            _isLoading = false;
+                          });
                         } else {
                           _registraUsuario();
                           Scaffold.of(context).showSnackBar(SnackBar(
                               backgroundColor: Colors.blue,
                               content: Text('Registro Exitoso')));
                           Future.delayed(Duration(seconds: 2), () {
-                            Navigator.pop(context);
+                            setState(() {
+                              _isLoading = false;
+                            });
                             Navigator.pushReplacementNamed(context, 'login');
                           });
                         }
@@ -250,9 +266,9 @@ class _RegistroPageState extends State<RegistroPage> {
                 }
               }
             }),
-        SizedBox(width: 15.0),
+        SizedBox(width: 10.0),
         RaisedButton(
-            color: Colors.blue,
+            color: Colors.blueGrey,
             child: Text('Limpiar', style: TextStyle(color: Colors.white)),
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20.0)),
@@ -263,18 +279,29 @@ class _RegistroPageState extends State<RegistroPage> {
               _editPass.text = '';
               _editRePass.text = '';
             }),
+        SizedBox(width: 10.0),
+        _loading(),
       ],
     );
   }
 
-  void _registraUsuario() async {
+  Widget _loading() {
+    if (_isLoading == true)
+      return SizedBox(
+        height: 20.0,
+        width: 20.0,
+        child: CircularProgressIndicator()
+      );
+    else
+      return Container();
+  }
 
+  void _registraUsuario() async {
     return await dbReference.collection("Usuarios").document(_correo).setData({
       'Nombre': _nombre,
       'Fecha de Nacimiento': _fecha,
       'Genero': _genero,
       'Correo': _correo,
-      'Token' : '',
     });
   }
 

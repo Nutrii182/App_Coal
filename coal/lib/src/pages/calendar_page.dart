@@ -1,6 +1,6 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:coal/src/shared/preferences_user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:coal/src/shared/cita_class.dart';
 import 'package:coal/src/widgets/drawer.dart';
@@ -17,6 +17,7 @@ class _CalendarPageState extends State<CalendarPage> {
   List<dynamic> _selectedEvents;
   CalendarController _calendarController;
   final dbReference = Firestore.instance;
+  final fcmReference = FirebaseMessaging();
   final pref = new PreferencesUser();
 
   @override
@@ -26,7 +27,6 @@ class _CalendarPageState extends State<CalendarPage> {
     _events = {};
     _selectedEvents = [];
     _getEvents();
-    _getToken();
   }
 
   @override
@@ -93,26 +93,6 @@ class _CalendarPageState extends State<CalendarPage> {
     );
   }
 
-  void _getToken() async {
-    String _token;
-
-    final user = await FirebaseAuth.instance.currentUser();
-    final idToken = await user.getIdToken();
-    _token = idToken.token;
-    _updateToken(_token);
-  }
-
-  void _updateToken(String token) {
-    try {
-      dbReference
-          .collection('Usuarios')
-          .document(pref.email)
-          .updateData({'Token': token});
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
   DateTime _convierteFecha(String fecha) {
     final temp = fecha.substring(0).split('/');
     final dia = temp[0];
@@ -129,7 +109,7 @@ class _CalendarPageState extends State<CalendarPage> {
     setState(() {
       items.forEach((v) {
         _cita = Cita(v['Nombre'], v['Usuario'], v['Motivo'], v['Fecha'],
-            v['Hora'], v['Estado']);
+            v['Hora'], v['Estado'], v['Token']);
         if (_events[_convierteFecha(_cita.fecha)] != null)
           _events[_convierteFecha(_cita.fecha)].add(_cita);
         else
@@ -139,27 +119,45 @@ class _CalendarPageState extends State<CalendarPage> {
     return _events;
   }
 
-  Widget _showEvents(dynamic event) {
-    if (event.estado == 'En Espera') {
+  Widget _showEvents(Cita event) {
+    if (event.estado == 'En Espera' && event.usuario == pref.email) {
       return ListTile(
         leading: Icon(Icons.event),
         title: Text("Cita ${event.hora}"),
         subtitle: Text('En Espera'),
+        onTap: () => Navigator.pushNamed(context, 'cancela', arguments: event),
       );
     } else {
-      if (event.estado == 'Aceptada') {
+      if (event.estado == 'En Espera') {
         return ListTile(
-          leading: Icon(Icons.event_available, color: Colors.blue),
+          leading: Icon(Icons.event),
           title: Text("Cita ${event.hora}"),
-          subtitle: Text('Aceptada', style: TextStyle(color: Colors.blue)),
+          subtitle: Text('En Espera'),
         );
       } else {
-        return ListTile(
-          leading: Icon(Icons.event_busy, color: Colors.red),
-          title: Text("Cita ${event.hora}"),
-          subtitle:
-              Text('Cancelada', style: TextStyle(color: Colors.redAccent)),
-        );
+        if (event.estado == 'Aceptada' && event.usuario == pref.email) {
+          return ListTile(
+            leading: Icon(Icons.event_available, color: Colors.blue),
+            title: Text("Cita ${event.hora}"),
+            subtitle: Text('Aceptada', style: TextStyle(color: Colors.blue)),
+            onTap: () => Navigator.pushNamed(context, 'cancela', arguments: event),
+          );
+        } else {
+          if (event.estado == 'Aceptada') {
+            return ListTile(
+              leading: Icon(Icons.event_available, color: Colors.blue),
+              title: Text("Cita ${event.hora}"),
+              subtitle: Text('Aceptada', style: TextStyle(color: Colors.blue)),
+            );
+          } else {
+            return ListTile(
+              leading: Icon(Icons.event_busy, color: Colors.red),
+              title: Text("Cita ${event.hora}"),
+              subtitle:
+                  Text('Cancelada', style: TextStyle(color: Colors.redAccent)),
+            );
+          }
+        }
       }
     }
   }

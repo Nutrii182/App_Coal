@@ -48,6 +48,14 @@ class PreferencesUser {
     _pref.setString('Correo', value);
   }
 
+  get token{
+    return _pref.getString('Token') ?? null;
+  }
+
+  set token(String value){
+    _pref.setString('Token', value);
+  }
+
   get lastPage{
     return _pref.getString('UltimaPagina') ?? null;
   }
