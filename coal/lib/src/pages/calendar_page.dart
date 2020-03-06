@@ -1,4 +1,5 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
+//import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:coal/src/providers/push_notifications.dart';
 import 'package:coal/src/shared/preferences_user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -13,11 +14,11 @@ class CalendarPage extends StatefulWidget {
 
 class _CalendarPageState extends State<CalendarPage> {
   Cita _cita;
+  String _title, _subtitle;
   Map<DateTime, List<Cita>> _events;
   List<dynamic> _selectedEvents;
   CalendarController _calendarController;
   final dbReference = Firestore.instance;
-  final fcmReference = FirebaseMessaging();
   final pref = new PreferencesUser();
 
   @override
@@ -27,6 +28,7 @@ class _CalendarPageState extends State<CalendarPage> {
     _events = {};
     _selectedEvents = [];
     _getEvents();
+    showAlert();
   }
 
   @override
@@ -140,7 +142,8 @@ class _CalendarPageState extends State<CalendarPage> {
             leading: Icon(Icons.event_available, color: Colors.blue),
             title: Text("Cita ${event.hora}"),
             subtitle: Text('Aceptada', style: TextStyle(color: Colors.blue)),
-            onTap: () => Navigator.pushNamed(context, 'cancela', arguments: event),
+            onTap: () =>
+                Navigator.pushNamed(context, 'cancela', arguments: event),
           );
         } else {
           if (event.estado == 'Aceptada') {
@@ -154,11 +157,90 @@ class _CalendarPageState extends State<CalendarPage> {
               leading: Icon(Icons.event_busy, color: Colors.red),
               title: Text("Cita ${event.hora}"),
               subtitle:
-                  Text('Cancelada', style: TextStyle(color: Colors.redAccent)),
+                  Text('Rechazada', style: TextStyle(color: Colors.redAccent)),
             );
           }
         }
       }
     }
+  }
+
+  void showAlert() {
+    final pushNoti = PushNotifications();
+    pushNoti.initNotifications();
+    pushNoti.message.listen((argument) {
+      _title = argument['notification']['title'];
+      _subtitle = argument['notification']['body'];
+
+      if (_title == 'Cita Aceptada') {
+
+        return showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0)
+            ),
+            content: Container(
+              padding: EdgeInsets.all(10.0),
+              height: 105.0,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Text(_title, style: TextStyle(color: Colors.blue, fontSize: 25.0 )),
+                  SizedBox(height: 10.0),
+                  Text(_subtitle, style: TextStyle(color: Colors.black)),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                color: Colors.blue,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0)
+                ),
+                child: Text('Aceptar', style: TextStyle(color: Colors.white)),
+                onPressed: () {
+                   Navigator.of(context).popAndPushNamed('calendar');
+                }
+              ),
+            ],
+          ),
+        );
+      } else {
+
+        return showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0)
+            ),
+            content: Container(
+              padding: EdgeInsets.all(10.0),
+              height: 150.0,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Text(_title, style: TextStyle(color: Colors.red, fontSize: 25.0 )),
+                  SizedBox(height: 10.0),
+                  Text(_subtitle, style: TextStyle(color: Colors.black)),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                color: Colors.red,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0)
+                ),
+                child: Text('Aceptar', style: TextStyle(color: Colors.white)),
+                onPressed: () {
+                   Navigator.of(context).popAndPushNamed('calendar');
+                }
+              ),
+            ],
+          ),
+        );
+      }
+    });
   }
 }

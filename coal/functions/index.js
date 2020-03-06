@@ -3,7 +3,6 @@ const admin = require('firebase-admin');
 admin.initializeApp(functions.config().firebase);
 
 const dbReference = admin.firestore();
-const fcmReference = admin.messaging();
 
 exports.sendNotification = functions.firestore.document('Citas/{idCita}').onUpdate(async (change, context) => {
 
@@ -11,6 +10,7 @@ exports.sendNotification = functions.firestore.document('Citas/{idCita}').onUpda
     const token = upDoc.Token;
 
     if (upDoc.Estado === 'Aceptada') {
+        
         const payload = {
             notification: {
                 title: "Cita Aceptada",
@@ -21,6 +21,7 @@ exports.sendNotification = functions.firestore.document('Citas/{idCita}').onUpda
         return admin.messaging().sendToDevice(token, payload);
 
     } else {
+
         const payload = {
             notification: {
                 title: "Cita Rechazada",

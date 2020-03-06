@@ -18,6 +18,7 @@ class PushNotifications {
     _firebaseMessaging.requestNotificationPermissions();
 
     _firebaseMessaging.getToken().then((token){
+      print(token);
       _pref.token = token;
     });
 
@@ -33,9 +34,11 @@ class PushNotifications {
       },
 
       onResume: (info) async {
+        print(info);
       },
 
       onLaunch: (info) async {
+        print(info);
       },
     );
   }

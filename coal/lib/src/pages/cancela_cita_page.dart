@@ -1,12 +1,10 @@
-
+import 'package:coal/src/shared/preferences_user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:coal/src/shared/cita_class.dart';
-import 'package:coal/src/shared/preferences_user.dart';
 import 'package:coal/src/widgets/drawer.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
+import 'package:flutter/material.dart';
+import 'package:mailer/mailer.dart';
 
 class CancelaCitaPage extends StatefulWidget {
   @override
@@ -23,7 +21,7 @@ class _CancelaCitaPageState extends State<CancelaCitaPage> {
   Widget build(BuildContext context) {
 
     _cita = ModalRoute.of(context).settings.arguments;
-
+    
     return Scaffold(
       drawer: DrawerWidget(),
       appBar: AppBar(
