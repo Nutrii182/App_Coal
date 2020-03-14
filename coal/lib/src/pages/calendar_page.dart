@@ -1,4 +1,3 @@
-//import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:coal/src/providers/push_notifications.dart';
 import 'package:coal/src/shared/preferences_user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -28,7 +27,9 @@ class _CalendarPageState extends State<CalendarPage> {
     _events = {};
     _selectedEvents = [];
     _getEvents();
-    showAlert();
+    _updateToken();
+    final pushNoti = PushNotifications();
+    showAlertState(pushNoti);
   }
 
   @override
@@ -38,6 +39,7 @@ class _CalendarPageState extends State<CalendarPage> {
     return Scaffold(
       drawer: DrawerWidget(),
       appBar: AppBar(title: Text('Calendario Coal')),
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,7 +49,7 @@ class _CalendarPageState extends State<CalendarPage> {
               events: _events,
               formatAnimation: FormatAnimation.slide,
               calendarController: _calendarController,
-              startingDayOfWeek: StartingDayOfWeek.monday,
+              startingDayOfWeek: StartingDayOfWeek.sunday,
               headerStyle: HeaderStyle(
                   centerHeaderTitle: true, formatButtonVisible: false),
               calendarStyle: CalendarStyle(
@@ -126,6 +128,7 @@ class _CalendarPageState extends State<CalendarPage> {
       return ListTile(
         leading: Icon(Icons.event),
         title: Text("Cita ${event.hora}"),
+        trailing: Icon(Icons.keyboard_arrow_right),
         subtitle: Text('En Espera'),
         onTap: () => Navigator.pushNamed(context, 'cancela', arguments: event),
       );
@@ -140,6 +143,7 @@ class _CalendarPageState extends State<CalendarPage> {
         if (event.estado == 'Aceptada' && event.usuario == pref.email) {
           return ListTile(
             leading: Icon(Icons.event_available, color: Colors.blue),
+            trailing: Icon(Icons.keyboard_arrow_right),
             title: Text("Cita ${event.hora}"),
             subtitle: Text('Aceptada', style: TextStyle(color: Colors.blue)),
             onTap: () =>
@@ -157,7 +161,7 @@ class _CalendarPageState extends State<CalendarPage> {
               leading: Icon(Icons.event_busy, color: Colors.red),
               title: Text("Cita ${event.hora}"),
               subtitle:
-                  Text('Rechazada', style: TextStyle(color: Colors.redAccent)),
+                  Text('Rechazada', style: TextStyle(color: Colors.red)),
             );
           }
         }
@@ -165,28 +169,37 @@ class _CalendarPageState extends State<CalendarPage> {
     }
   }
 
-  void showAlert() {
-    final pushNoti = PushNotifications();
+  void _updateToken() {
+    try {
+      dbReference
+          .collection('Usuarios')
+          .document(pref.email)
+          .updateData({'Token': pref.token});
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  void showAlertState(PushNotifications pushNoti) {
     pushNoti.initNotifications();
     pushNoti.message.listen((argument) {
       _title = argument['notification']['title'];
       _subtitle = argument['notification']['body'];
 
       if (_title == 'Cita Aceptada') {
-
         return showDialog(
           context: context,
           builder: (context) => AlertDialog(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.0)
-            ),
+                borderRadius: BorderRadius.circular(20.0)),
             content: Container(
               padding: EdgeInsets.all(10.0),
               height: 105.0,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
-                  Text(_title, style: TextStyle(color: Colors.blue, fontSize: 25.0 )),
+                  Text(_title,
+                      style: TextStyle(color: Colors.blue, fontSize: 25.0)),
                   SizedBox(height: 10.0),
                   Text(_subtitle, style: TextStyle(color: Colors.black)),
                 ],
@@ -194,49 +207,44 @@ class _CalendarPageState extends State<CalendarPage> {
             ),
             actions: <Widget>[
               FlatButton(
-                color: Colors.blue,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0)
-                ),
-                child: Text('Aceptar', style: TextStyle(color: Colors.white)),
-                onPressed: () {
-                   Navigator.of(context).popAndPushNamed('calendar');
-                }
-              ),
+                  color: Colors.blue,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0)),
+                  child: Text('Aceptar', style: TextStyle(color: Colors.white)),
+                  onPressed: () {
+                    Navigator.of(context).popAndPushNamed('calendar');
+                  }),
             ],
           ),
         );
       } else {
-
         return showDialog(
           context: context,
           builder: (context) => AlertDialog(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.0)
-            ),
+                borderRadius: BorderRadius.circular(20.0)),
             content: Container(
               padding: EdgeInsets.all(10.0),
               height: 150.0,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
-                  Text(_title, style: TextStyle(color: Colors.red, fontSize: 25.0 )),
+                  Text(_title,
+                      style: TextStyle(color: Colors.red, fontSize: 25.0)),
                   SizedBox(height: 10.0),
-                  Text(_subtitle, style: TextStyle(color: Colors.black)),
+                  Text(_subtitle, style: TextStyle(color: Colors.black, )),
                 ],
               ),
             ),
             actions: <Widget>[
               FlatButton(
-                color: Colors.red,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0)
-                ),
-                child: Text('Aceptar', style: TextStyle(color: Colors.white)),
-                onPressed: () {
-                   Navigator.of(context).popAndPushNamed('calendar');
-                }
-              ),
+                  color: Colors.red,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0)),
+                  child: Text('Aceptar', style: TextStyle(color: Colors.white), textAlign: TextAlign.center),
+                  onPressed: () {
+                    Navigator.of(context).popAndPushNamed('calendar');
+                  }),
             ],
           ),
         );

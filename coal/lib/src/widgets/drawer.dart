@@ -1,10 +1,12 @@
 
+import 'package:coal/src/shared/preferences_user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class DrawerWidget extends StatelessWidget {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final pref = new PreferencesUser();
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +28,7 @@ class DrawerWidget extends StatelessWidget {
             title: Text('Información Personal', style: TextStyle(color: Colors.lightBlue)),
             trailing: Icon(Icons.keyboard_arrow_right, color: Colors.lightBlue),
             onTap: () {
-              Navigator.pushNamed(context, 'info');
+              Navigator.pushReplacementNamed(context, 'info');
             },
           ),
           Divider(),
@@ -35,7 +37,7 @@ class DrawerWidget extends StatelessWidget {
             title: Text('Solicitar Cita', style: TextStyle(color: Colors.lightBlue)),
             trailing: Icon(Icons.keyboard_arrow_right, color: Colors.lightBlue),
             onTap: () {
-              Navigator.pushNamed(context, 'cita');
+              Navigator.pushReplacementNamed(context, 'cita');
             },
           ),
           Divider(),
@@ -44,7 +46,16 @@ class DrawerWidget extends StatelessWidget {
             title: Text('Calendario', style: TextStyle(color: Colors.lightBlue)),
             trailing: Icon(Icons.keyboard_arrow_right, color: Colors.lightBlue),
             onTap: () {
-              Navigator.pushNamed(context, 'calendar');
+              Navigator.pushReplacementNamed(context, 'calendar');
+            },
+          ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.help_outline, color: Colors.lightBlue),
+            title: Text('Instructivo para Citas', style: TextStyle(color: Colors.lightBlue)),
+            trailing: Icon(Icons.keyboard_arrow_right, color: Colors.lightBlue),
+            onTap: () {
+              Navigator.pushReplacementNamed(context, 'instructivo');
             },
           ),
           Divider(),

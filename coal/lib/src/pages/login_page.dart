@@ -22,6 +22,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(title: Text('Bienvenido')),
+        backgroundColor: Colors.white,
         body: Builder(
           builder: (context) => SafeArea(
             child: Form(
@@ -115,7 +116,7 @@ class _LoginPageState extends State<LoginPage> {
               print("Error Iniciando Sesion: $e");
               String exception = getExceptionText(e);
               Scaffold.of(context).showSnackBar(SnackBar(
-                  backgroundColor: Colors.blue, content: Text(exception)));
+                  backgroundColor: Colors.red, content: Text(exception)));
               setState(() {
                 _isLoading = false;
               });
@@ -168,6 +169,7 @@ class _LoginPageState extends State<LoginPage> {
       pref.date = value.data['Fecha de Nacimiento'];
       pref.gender = value.data['Genero'];
       pref.email = value.data['Correo'];
+      pref.token = value.data['Token'];
     });
   }
 

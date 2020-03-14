@@ -27,6 +27,7 @@ class _CancelaCitaPageState extends State<CancelaCitaPage> {
       appBar: AppBar(
         title: Text('Información de la Cita')
       ),
+      backgroundColor: Colors.white,
       body: Container(
         padding: EdgeInsets.only(top: 20.0),
         child: ListView(
@@ -90,7 +91,7 @@ class _CancelaCitaPageState extends State<CancelaCitaPage> {
         content: SingleChildScrollView(
           child: ListBody(
             children: <Widget>[
-              Text('¿Desea Cancelar la Cita?', style: TextStyle(color: Colors.red)),
+              Text('¿Está Seguro?', style: TextStyle(color: Colors.red)),
             ],
           ),
         ),
@@ -102,7 +103,7 @@ class _CancelaCitaPageState extends State<CancelaCitaPage> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.0)
                 ),
-                child: Text('Aceptar', style: TextStyle(color: Colors.white)),
+                child: Text('Sí', style: TextStyle(color: Colors.white)),
                 onPressed: () {
                   _eliminaId();
                   _sendEmail();
@@ -115,7 +116,7 @@ class _CancelaCitaPageState extends State<CancelaCitaPage> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.0)
                 ),
-                child: Text('Cancelar', style: TextStyle(color: Colors.white)),
+                child: Text('No', style: TextStyle(color: Colors.white)),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },

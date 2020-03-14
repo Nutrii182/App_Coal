@@ -1,5 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:coal/src/pages/calendar_page.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-//import 'package:coal/src/providers/push_notifications.dart';
 import 'package:coal/src/shared/preferences_user.dart';
 import 'package:coal/src/pages/login_page.dart';
 import 'package:coal/src/routes/routes.dart';
@@ -18,34 +19,16 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  //String _title, _subtitle;
+
+  FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   void initState() {
     super.initState();
-    // final pushNoti = PushNotifications();
-    // pushNoti.initNotifications();
-    // pushNoti.message.listen((argument) {
-    //   _title = argument['notification']['title'];
-    //   _subtitle = argument['notification']['body'];
-
-    //   showDialog(
-    //     context: context,
-    //     builder: (context) => AlertDialog(
-    //       content: ListTile(
-    //         title: Text(_title),
-    //         subtitle: Text(_subtitle),
-    //       ),
-    //       actions: <Widget>[
-    //         FlatButton(
-    //           child: Text('Ok'),
-    //           onPressed: () => Navigator.of(context).pop(),
-    //         ),
-    //       ],
-    //     ),
-    //   );
-
-    // });
+    getUser().then((user){
+      if(user != null)
+        CalendarPage();
+    });
   }
 
   @override
@@ -68,5 +51,9 @@ class _MyAppState extends State<MyApp> {
             builder: (BuildContext context) => LoginPage());
       },
     );
+  }
+
+  Future <FirebaseUser> getUser() async {
+    return await _auth.currentUser();
   }
 }

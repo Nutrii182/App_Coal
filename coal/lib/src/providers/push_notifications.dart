@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:coal/src/shared/preferences_user.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
@@ -9,6 +10,7 @@ class PushNotifications {
 
   FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
   final _pref = new PreferencesUser();
+  final dbReference = Firestore.instance;
 
   final _messageStreamController = StreamController<Map<String, dynamic>>.broadcast();
   Stream<Map<String, dynamic>> get message => _messageStreamController.stream;

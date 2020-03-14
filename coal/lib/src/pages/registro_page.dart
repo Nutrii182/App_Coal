@@ -29,6 +29,7 @@ class _RegistroPageState extends State<RegistroPage> {
       appBar: AppBar(
         title: Text('Registro'),
       ),
+      backgroundColor: Colors.white,
       body: Builder(
         builder: (context) => Center(
             child: Form(
@@ -217,7 +218,7 @@ class _RegistroPageState extends State<RegistroPage> {
               if (_formkey.currentState.validate()) {
                 if (_password != _repPassword) {
                   Scaffold.of(context).showSnackBar(SnackBar(
-                      backgroundColor: Colors.blue,
+                      backgroundColor: Colors.red,
                       content: Text('Las contraseñas no son iguales')));
                   setState(() {
                     _isLoading = false;
@@ -225,7 +226,7 @@ class _RegistroPageState extends State<RegistroPage> {
                 } else {
                   if (_genero == 'Seleccione su género') {
                     Scaffold.of(context).showSnackBar(SnackBar(
-                        backgroundColor: Colors.blue,
+                        backgroundColor: Colors.red,
                         content: Text('Favor de seleccionar su género')));
                     setState(() {
                       _isLoading = false;
@@ -235,7 +236,7 @@ class _RegistroPageState extends State<RegistroPage> {
                     Future.delayed(Duration(seconds: 2), () {
                       if (_stateUser == true) {
                         Scaffold.of(context).showSnackBar(SnackBar(
-                            backgroundColor: Colors.blue,
+                            backgroundColor: Colors.red,
                             content: Text('Usuario Existente')));
                         setState(() {
                           _isLoading = false;
@@ -243,7 +244,7 @@ class _RegistroPageState extends State<RegistroPage> {
                       } else {
                         if (_creaUsuario() == null) {
                           Scaffold.of(context).showSnackBar(SnackBar(
-                              backgroundColor: Colors.blue,
+                              backgroundColor: Colors.red,
                               content: Text('Error en el Registro')));
                           setState(() {
                             _isLoading = false;
@@ -288,10 +289,7 @@ class _RegistroPageState extends State<RegistroPage> {
   Widget _loading() {
     if (_isLoading == true)
       return SizedBox(
-        height: 20.0,
-        width: 20.0,
-        child: CircularProgressIndicator()
-      );
+          height: 20.0, width: 20.0, child: CircularProgressIndicator());
     else
       return Container();
   }
@@ -302,6 +300,7 @@ class _RegistroPageState extends State<RegistroPage> {
       'Fecha de Nacimiento': _fecha,
       'Genero': _genero,
       'Correo': _correo,
+      'Token': '',
     });
   }
 

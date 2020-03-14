@@ -22,6 +22,7 @@ class _InfoPageState extends State<InfoPage> {
       appBar: AppBar(
         title: Text('Información Personal'),
       ),
+      backgroundColor: Colors.white,
       drawer: DrawerWidget(),
       body: Container(
         padding: EdgeInsets.only(top: 20.0),

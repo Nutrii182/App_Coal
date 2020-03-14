@@ -31,6 +31,7 @@ class _CitaPageState extends State<CitaPage> {
     return Scaffold(
         drawer: DrawerWidget(),
         appBar: AppBar(title: Text('Solicitar Cita')),
+        backgroundColor: Colors.white,
         body: Builder(
           builder: (context) => Center(
               child: Container(
@@ -236,6 +237,7 @@ class _CitaPageState extends State<CitaPage> {
       'Motivo': _cita.motivo,
       'Estado': _cita.estado,
       'Token': _cita.token,
+      'Proxima': false,
     });
   }
 
