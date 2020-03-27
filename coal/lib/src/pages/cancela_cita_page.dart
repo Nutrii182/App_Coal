@@ -152,7 +152,7 @@ class _CancelaCitaPageState extends State<CancelaCitaPage> {
       ..subject = 'Solicitud de Cita'
       ..text = 'Envío de Avisos mediante correo electrónico'
       ..html =
-          '<h2>Solicitud de Cita</h2><p>El usuario ${pref.email} de nombre ${pref.name} canceló su cita el día ${_cita.fecha} a las ${_cita.hora}</p><br><p>Desea aceptar la cita especificada anteriormente..</p>';
+          '<h2>Cancelación de Cita</h2><p>El usuario ${pref.email} de nombre ${pref.name} canceló su cita del día ${_cita.fecha} a las ${_cita.hora}</p>';
 
     try {
       final sendMail = await send(_message, smtpServer);

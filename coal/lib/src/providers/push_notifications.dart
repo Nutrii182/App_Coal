@@ -1,10 +1,8 @@
-
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:coal/src/shared/preferences_user.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 import 'dart:io';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:coal/src/shared/preferences_user.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 
 class PushNotifications {
 

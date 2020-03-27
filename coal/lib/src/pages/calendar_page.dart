@@ -24,6 +24,7 @@ class _CalendarPageState extends State<CalendarPage> {
   void initState() {
     super.initState();
     _calendarController = CalendarController();
+    _erasePast();
     _events = {};
     _selectedEvents = [];
     _getEvents();
@@ -251,4 +252,47 @@ class _CalendarPageState extends State<CalendarPage> {
       }
     });
   }
+
+  bool _citaPasada(String fecha, String hora){
+
+    final date = fecha.substring(0).split('/');
+    final day = date[2];
+    final month = date[1];
+    final year = date[0];
+
+    final time = hora.substring(0).split(':');
+    final hour = time[0];
+    final minute = time[1];
+
+    DateTime newDate = DateTime.utc(int.parse(day), int.parse(month), int.parse(year), int.parse(hour), int.parse(minute));
+
+    if(newDate.isBefore(DateTime.now()))
+      return true;
+    return false;
+  }
+
+  void deleteCita(String id){
+
+    try{
+      dbReference.collection('Citas').document(id).delete();
+    }catch (e){
+      print(e.toString());
+    }
+  }
+
+  Future<void> _erasePast() async {
+
+    try{
+      await dbReference.collection('Citas').getDocuments().then((val){
+        for(var i = 0; i < val.documents.length; i++){
+          if(_citaPasada(val.documents[i].data["Fecha"], val.documents[i].data["Hora"]) == true){
+            deleteCita(val.documents[i].documentID);
+          }
+        }
+      });
+    } catch(e){
+      print(e.toString());
+    }
+  }
+
 }
