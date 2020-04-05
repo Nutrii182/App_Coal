@@ -1,5 +1,4 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:coal/src/shared/preferences_user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 import 'dart:io';
@@ -7,7 +6,6 @@ import 'dart:io';
 class PushNotifications {
 
   FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
-  final _pref = new PreferencesUser();
   final dbReference = Firestore.instance;
 
   final _messageStreamController = StreamController<Map<String, dynamic>>.broadcast();
@@ -16,11 +14,6 @@ class PushNotifications {
   initNotifications(){
 
     _firebaseMessaging.requestNotificationPermissions();
-
-    _firebaseMessaging.getToken().then((token){
-      print(token);
-      _pref.token = token;
-    });
 
     _firebaseMessaging.configure(
 

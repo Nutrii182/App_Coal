@@ -1,7 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:coal/src/pages/calendar_page.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:coal/src/shared/preferences_user.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:coal/src/pages/calendar_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:coal/src/pages/login_page.dart';
 import 'package:coal/src/routes/routes.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
 
   FirebaseAuth _auth = FirebaseAuth.instance;
+  final dbReference = Firestore.instance;
 
   @override
   void initState() {

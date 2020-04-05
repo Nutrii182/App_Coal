@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:coal/src/shared/preferences_user.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -14,6 +16,8 @@ class _RegistroPageState extends State<RegistroPage> {
   List<String> _list = ['Seleccione su género', 'Masculino', 'Femenino'];
   bool _stateUser = false, _isLoading = false;
   final dbReference = Firestore.instance;
+  FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
+  final _pref = new PreferencesUser();
   FirebaseAuth _auth = FirebaseAuth.instance;
   final _formkey = GlobalKey<FormState>();
 
@@ -295,12 +299,18 @@ class _RegistroPageState extends State<RegistroPage> {
   }
 
   void _registraUsuario() async {
+
+    _firebaseMessaging.getToken().then((token){
+      print(token);
+      _pref.token = token;
+    });
+
     return await dbReference.collection("Usuarios").document(_correo).setData({
       'Nombre': _nombre,
       'Fecha de Nacimiento': _fecha,
       'Genero': _genero,
       'Correo': _correo,
-      'Token': '',
+      'Token': _pref.token,
     });
   }
 

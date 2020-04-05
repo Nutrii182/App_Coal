@@ -5,6 +5,7 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:coal/src/shared/cita_class.dart';
 import 'package:coal/src/widgets/drawer.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class CalendarPage extends StatefulWidget {
   @override
@@ -28,7 +29,6 @@ class _CalendarPageState extends State<CalendarPage> {
     _events = {};
     _selectedEvents = [];
     _getEvents();
-    _updateToken();
     final pushNoti = PushNotifications();
     showAlertState(pushNoti);
   }
@@ -170,17 +170,6 @@ class _CalendarPageState extends State<CalendarPage> {
     }
   }
 
-  void _updateToken() {
-    try {
-      dbReference
-          .collection('Usuarios')
-          .document(pref.email)
-          .updateData({'Token': pref.token});
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
   void showAlertState(PushNotifications pushNoti) {
     pushNoti.initNotifications();
     pushNoti.message.listen((argument) {
@@ -253,20 +242,23 @@ class _CalendarPageState extends State<CalendarPage> {
     });
   }
 
-  bool _citaPasada(String fecha, String hora){
+      bool _citaPasada(String fecha, String hora){
 
     final date = fecha.substring(0).split('/');
     final day = date[2];
     final month = date[1];
     final year = date[0];
 
-    final time = hora.substring(0).split(':');
-    final hour = time[0];
-    final minute = time[1];
+    String fechaHoy = DateFormat("dd/MM/yyyy").format(DateTime.now());
+    final dateNow = fechaHoy.substring(0).split('/');
+    final dia = dateNow[2];
+    final mes = dateNow[1];
+    final anio = dateNow[0];
 
-    DateTime newDate = DateTime.utc(int.parse(day), int.parse(month), int.parse(year), int.parse(hour), int.parse(minute));
+    DateTime newDate = DateTime.utc(int.parse(day), int.parse(month), int.parse(year));
+    DateTime nowDate = DateTime.utc(int.parse(dia), int.parse(mes), int.parse(anio));
 
-    if(newDate.isBefore(DateTime.now()))
+    if(newDate.isBefore(nowDate))
       return true;
     return false;
   }
@@ -285,8 +277,9 @@ class _CalendarPageState extends State<CalendarPage> {
     try{
       await dbReference.collection('Citas').getDocuments().then((val){
         for(var i = 0; i < val.documents.length; i++){
-          if(_citaPasada(val.documents[i].data["Fecha"], val.documents[i].data["Hora"]) == true){
+          if(_citaPasada(val.documents[i].data["Fecha"], val.documents[i].data["Hora"]) == true || val.documents[i].data["Estado"] == 'Rechazada'){
             deleteCita(val.documents[i].documentID);
+            print('Hola');
           }
         }
       });
@@ -294,5 +287,4 @@ class _CalendarPageState extends State<CalendarPage> {
       print(e.toString());
     }
   }
-
 }

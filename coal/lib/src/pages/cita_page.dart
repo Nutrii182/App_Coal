@@ -14,7 +14,7 @@ class CitaPage extends StatefulWidget {
 }
 
 class _CitaPageState extends State<CitaPage> {
-  String _motivo, _fecha;
+  String _motivo, _fecha, _dateFormat;
   DateTime temp, _beginTime;
   bool _band = false, _isLoading = false;
   Cita _cita;
@@ -87,7 +87,6 @@ class _CitaPageState extends State<CitaPage> {
   }
 
   void _selectDate(BuildContext context) async {
-    String _dateFormat;
 
     DateTime picked = await showDatePicker(
         context: context,
@@ -167,7 +166,6 @@ class _CitaPageState extends State<CitaPage> {
                       _isLoading = false;
                     });
                   } else {
-                    _sendEmail();
                     _registraCita();
                     Scaffold.of(context).showSnackBar(SnackBar(
                         backgroundColor: Colors.blue,
@@ -225,6 +223,7 @@ class _CitaPageState extends State<CitaPage> {
     _cita = Cita(pref.name, pref.email, _motivo, _fecha, _dateFormat,
         'En Espera', pref.token);
     String _idCita = _cita.fecha.replaceAll("/", ":");
+    _sendEmail(_idCita + ':' + _cita.hora);
 
     return await dbReference
         .collection("Citas")
@@ -265,7 +264,7 @@ class _CitaPageState extends State<CitaPage> {
     });
   }
 
-  void _sendEmail() async {
+  void _sendEmail(String id) async {
     String _s1 = DateFormat("HH:mm").format(_beginTime);
     String _user = "nutrii182@gmail.com";
     String _password = "Nutriiburra182";
@@ -278,8 +277,7 @@ class _CitaPageState extends State<CitaPage> {
       ..subject = 'Solicitud de Cita'
       ..text = 'Envío de Avisos mediante correo electrónico'
       ..html =
-          '<h2>Solicitud de Cita</h2><p>El usuario ${pref.email} de nombre ${pref.name} solicitó una cita el día $_fecha a las $_s1 con motivo de $_motivo</p><br><p>Desea aceptar la cita especificada anteriormente..</p>';
-
+          '<h2>Solicitud de Cita</h2><p>El usuario ${pref.email} de nombre ${pref.name} solicitó una cita el día $_fecha a las $_s1 con motivo de $_motivo</p><br><p>Si desea aceptar la cita especificada anteriormente de click al link de abajo:</p><br><a href="https://swcoal.azurewebsites.net/Home/Cita_Aceptada?id=$id">https://swcoal.azurewebsites.net/Home/Cita_Aceptada?=id$id</a><br><p>Si desea rechazar la cita de click al siguiente link:</p><br><a href="https://swcoal.azurewebsites.net/Home/Cita_Rechazada?id=$id">https://swcoal.azurewebsites.net/Home/Cita_Rechazada?=id$id</a>';
     try {
       final sendMail = await send(_message, smtpServer);
       print('Message sent: ' + sendMail.toString());
