@@ -305,18 +305,18 @@ class _RegistroPageState extends State<RegistroPage> {
       _pref.token = token;
     });
 
-    return await dbReference.collection("Usuarios").document(_correo).setData({
-      'Nombre': _nombre,
+    return await dbReference.collection("Usuarios").document(_correo.toLowerCase()).setData({
+      'Nombre': _nombre.toLowerCase(),
       'Fecha de Nacimiento': _fecha,
-      'Genero': _genero,
-      'Correo': _correo,
+      'Genero': _genero.toLowerCase(),
+      'Correo': _correo.toLowerCase(),
       'Token': _pref.token,
     });
   }
 
   Future<AuthResult> _creaUsuario() async {
     final regis = await _auth.createUserWithEmailAndPassword(
-        email: _correo, password: _password);
+        email: _correo.toLowerCase(), password: _password);
 
     if (regis == null) return null;
     return regis;
