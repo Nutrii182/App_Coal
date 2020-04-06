@@ -262,7 +262,7 @@ class _RegistroPageState extends State<RegistroPage> {
                             setState(() {
                               _isLoading = false;
                             });
-                            Navigator.pushReplacementNamed(context, 'login');
+                            Navigator.popAndPushNamed(context, 'login');
                           });
                         }
                       }

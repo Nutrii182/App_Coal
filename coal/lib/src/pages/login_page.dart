@@ -107,7 +107,6 @@ class _LoginPageState extends State<LoginPage> {
             try {
               await _auth.signInWithEmailAndPassword(
                   email: _email, password: _password);
-              _setStorage();
               setState(() {
                 _isLoading = false;
               });
@@ -145,7 +144,7 @@ class _LoginPageState extends State<LoginPage> {
                   color: Colors.blue,
                   fontSize: 16.0)),
           onTap: () {
-            Navigator.pushNamed(context, 'registro');
+            Navigator.pushReplacementNamed(context, 'registro');
           },
         )
       ],
@@ -157,20 +156,6 @@ class _LoginPageState extends State<LoginPage> {
       return CircularProgressIndicator();
     else
       return Container();
-  }
-
-  void _setStorage() async {
-    await dbReference
-        .collection("Usuarios")
-        .document(_email)
-        .get()
-        .then((value) {
-      pref.name = value.data['Nombre'];
-      pref.date = value.data['Fecha de Nacimiento'];
-      pref.gender = value.data['Genero'];
-      pref.email = value.data['Correo'];
-      pref.token = value.data['Token'];
-    });
   }
 
   String validateEmail(String value) {

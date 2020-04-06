@@ -23,13 +23,14 @@ class _MyAppState extends State<MyApp> {
 
   FirebaseAuth _auth = FirebaseAuth.instance;
   final dbReference = Firestore.instance;
+  bool _inicio = false;
 
   @override
   void initState() {
     super.initState();
     getUser().then((user){
       if(user != null)
-        CalendarPage();
+        _inicio = true;
     });
   }
 
@@ -49,7 +50,12 @@ class _MyAppState extends State<MyApp> {
       initialRoute: 'login',
       routes: getApplicationsRoutes(),
       onGenerateRoute: (RouteSettings settings) {
-        return MaterialPageRoute(
+
+        if(_inicio)
+          return MaterialPageRoute(
+            builder: (BuildContext context) => CalendarPage());
+        else
+          return MaterialPageRoute(
             builder: (BuildContext context) => LoginPage());
       },
     );

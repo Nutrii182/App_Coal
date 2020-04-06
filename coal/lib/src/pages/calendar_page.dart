@@ -1,6 +1,7 @@
 import 'package:coal/src/providers/push_notifications.dart';
 import 'package:coal/src/shared/preferences_user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:coal/src/shared/cita_class.dart';
 import 'package:coal/src/widgets/drawer.dart';
@@ -18,12 +19,16 @@ class _CalendarPageState extends State<CalendarPage> {
   Map<DateTime, List<Cita>> _events;
   List<dynamic> _selectedEvents;
   CalendarController _calendarController;
+  FirebaseAuth _auth = FirebaseAuth.instance;
   final dbReference = Firestore.instance;
   final pref = new PreferencesUser();
 
   @override
   void initState() {
     super.initState();
+    getUser().then((user){
+      updateStorage(user.email);
+    });
     _calendarController = CalendarController();
     _erasePast();
     _events = {};
@@ -242,7 +247,7 @@ class _CalendarPageState extends State<CalendarPage> {
     });
   }
 
-      bool _citaPasada(String fecha, String hora){
+  bool _citaPasada(String fecha, String hora){
 
     final date = fecha.substring(0).split('/');
     final day = date[2];
@@ -286,5 +291,23 @@ class _CalendarPageState extends State<CalendarPage> {
     } catch(e){
       print(e.toString());
     }
+  }
+
+  Future <FirebaseUser> getUser() async {
+    return await _auth.currentUser();
+  }
+
+  void updateStorage(String user) async {
+    await dbReference
+        .collection("Usuarios")
+        .document(user)
+        .get()
+        .then((value) {
+      pref.name = value.data['Nombre'];
+      pref.date = value.data['Fecha de Nacimiento'];
+      pref.gender = value.data['Genero'];
+      pref.email = value.data['Correo'];
+      pref.token = value.data['Token'];
+    });
   }
 }
