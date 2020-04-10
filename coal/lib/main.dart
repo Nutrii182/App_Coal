@@ -23,19 +23,26 @@ class _MyAppState extends State<MyApp> {
 
   FirebaseAuth _auth = FirebaseAuth.instance;
   final dbReference = Firestore.instance;
+  final pref = new PreferencesUser();
   bool _inicio = false;
 
   @override
   void initState() {
     super.initState();
     getUser().then((user){
-      if(user != null)
+      if(user != null){
         _inicio = true;
+        pref.sesion = _inicio;
+      } else {
+        pref.sesion = _inicio;
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+
+    print("Inicio --------------------- $_inicio");
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       localizationsDelegates: [
@@ -51,7 +58,7 @@ class _MyAppState extends State<MyApp> {
       routes: getApplicationsRoutes(),
       onGenerateRoute: (RouteSettings settings) {
 
-        if(_inicio)
+        if(pref.sesion)
           return MaterialPageRoute(
             builder: (BuildContext context) => CalendarPage());
         else

@@ -56,11 +56,11 @@ class PreferencesUser {
     _pref.setString('Token', value);
   }
 
-  get lastPage{
-    return _pref.getString('UltimaPagina') ?? null;
+  get sesion{
+    return _pref.getBool('Sesion') ?? false;
   }
 
-  set lastPage(String value){
-    _pref.setString('UltimaPagina', value);
+  set sesion(bool value){
+    _pref.setBool('Sesion', value);
   }
 }

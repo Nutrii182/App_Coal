@@ -40,7 +40,6 @@ class _CalendarPageState extends State<CalendarPage> {
 
   @override
   Widget build(BuildContext context) {
-    pref.lastPage = 'calendar';
 
     return Scaffold(
       drawer: DrawerWidget(),

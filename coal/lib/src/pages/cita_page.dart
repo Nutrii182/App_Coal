@@ -1,7 +1,8 @@
-import 'package:coal/src/shared/cita_class.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:coal/src/shared/preferences_user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:coal/src/shared/cita_class.dart';
 import 'package:coal/src/widgets/drawer.dart';
 import 'package:mailer/smtp_server.dart';
 import 'package:flutter/material.dart';
@@ -22,11 +23,20 @@ class _CitaPageState extends State<CitaPage> {
   DateTime _entrada = DateTime.parse('1970-01-01 09:00:00.000');
   DateTime _salida = DateTime.parse('1970-01-01 19:00:00.000');
   TextEditingController _editDate = new TextEditingController();
-  final pref = new PreferencesUser();
+  FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
+  final _pref = new PreferencesUser();
+
+  @override
+  void initState() { 
+    super.initState();
+    _firebaseMessaging.getToken().then((token){
+      print(token);
+      _pref.token = token;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    pref.lastPage = 'cita';
 
     return Scaffold(
         drawer: DrawerWidget(),
@@ -148,10 +158,10 @@ class _CitaPageState extends State<CitaPage> {
             } else {
               if (_validaInicio() ||
                   _beginTime.isAfter(_salida) ||
-                  _beginTime.isBefore(_entrada)) {
+                  _beginTime.isBefore(_entrada) || _validateWeekends()) {
                 Scaffold.of(context).showSnackBar(SnackBar(
                     backgroundColor: Colors.blue,
-                    content: Text('Los Horarios son Inválidos')));
+                    content: Text('El horario es inválido, favor de revisar el instructivo')));
                 setState(() {
                   _isLoading = false;
                 });
@@ -218,10 +228,27 @@ class _CitaPageState extends State<CitaPage> {
     return false;
   }
 
+  bool _validateWeekends(){
+
+    String day = DateFormat('EEEE').format(temp);
+    String hour = DateFormat("HH:mm").format(_beginTime);
+    
+    final aux = hour.substring(0).split(':');
+    final hora = aux[0];
+
+    if(day == 'Sunday')
+      return true;
+    else{
+      if(day == 'Saturday' && int.parse(hora) >= 14)
+        return true;
+    }
+    return false;
+  }
+
   Future<void> _registraCita() async {
     final _dateFormat = DateFormat("HH:mm").format(_beginTime);
-    _cita = Cita(pref.name, pref.email, _motivo, _fecha, _dateFormat,
-        'En Espera', pref.token);
+    _cita = Cita(_pref.name, _pref.email, _motivo, _fecha, _dateFormat,
+        'En Espera', _pref.token);
     String _idCita = _cita.fecha.replaceAll("/", ":");
     _sendEmail(_idCita + ':' + _cita.hora);
 
@@ -264,10 +291,11 @@ class _CitaPageState extends State<CitaPage> {
     });
   }
 
-  void _sendEmail(String id) async {
+  Future<void> _sendEmail(String id) async {
+
     String _s1 = DateFormat("HH:mm").format(_beginTime);
     String _user = "nutrii182@gmail.com";
-    String _password = "Nutriiburra182";
+    String _password = "NutriiBurra182";
 
     final smtpServer = gmail(_user, _password);
 
@@ -277,14 +305,13 @@ class _CitaPageState extends State<CitaPage> {
       ..subject = 'Solicitud de Cita'
       ..text = 'Envío de Avisos mediante correo electrónico'
       ..html =
-          '<h2>Solicitud de Cita</h2><p>El usuario ${pref.email} de nombre ${pref.name} solicitó una cita el día $_fecha a las $_s1 con motivo de $_motivo</p><br><p>Si desea aceptar la cita especificada anteriormente de click al link de abajo:</p><br><a href="https://swcoal.azurewebsites.net/Home/Cita_Aceptada?id=$id">https://swcoal.azurewebsites.net/Home/Cita_Aceptada?=id$id</a><br><p>Si desea rechazar la cita de click al siguiente link:</p><br><a href="https://swcoal.azurewebsites.net/Home/Cita_Rechazada?id=$id">https://swcoal.azurewebsites.net/Home/Cita_Rechazada?=id$id</a>';
+          '<h2>Solicitud de Cita</h2><p>El usuario ${_pref.email} de nombre ${_pref.name} solicitó una cita el día $_fecha a las $_s1 con motivo de $_motivo</p><br><p>Si desea aceptar la cita especificada anteriormente de click al link de abajo:</p><br><a href="https://swcoal.azurewebsites.net/Home/Cita_Aceptada?id=$id">https://swcoal.azurewebsites.net/Home/Cita_Aceptada?=id$id</a><br><p>Si desea rechazar la cita de click al siguiente link:</p><br><a href="https://swcoal.azurewebsites.net/Home/Cita_Rechazada?id=$id">https://swcoal.azurewebsites.net/Home/Cita_Rechazada?=id$id</a>';
     try {
       final sendMail = await send(_message, smtpServer);
       print('Message sent: ' + sendMail.toString());
     } on MailerException catch (e) {
       for (var p in e.problems) print('Problem: ${p.code}: ${p.msg}');
     }
-
     var connection = PersistentConnection(smtpServer);
     await connection.close();
   }

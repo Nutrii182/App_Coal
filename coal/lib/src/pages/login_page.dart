@@ -144,7 +144,7 @@ class _LoginPageState extends State<LoginPage> {
                   color: Colors.blue,
                   fontSize: 16.0)),
           onTap: () {
-            Navigator.pushReplacementNamed(context, 'registro');
+            Navigator.pushNamed(context, 'registro');
           },
         )
       ],

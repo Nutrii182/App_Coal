@@ -64,6 +64,7 @@ class DrawerWidget extends StatelessWidget {
             title: Text('Cerrar Sesión', style: TextStyle(color: Colors.lightBlue)),
             onTap: () async {
               await _auth.signOut();
+              pref.sesion = false;
               await Navigator.of(context).pushNamedAndRemoveUntil('login', (Route<dynamic> route) => false);
             },
           ),

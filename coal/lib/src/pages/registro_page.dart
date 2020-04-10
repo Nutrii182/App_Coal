@@ -28,6 +28,15 @@ class _RegistroPageState extends State<RegistroPage> {
   TextEditingController _editRePass = new TextEditingController();
 
   @override
+  void initState() { 
+    super.initState();
+    _firebaseMessaging.getToken().then((token){
+      print(token);
+      _pref.token = token;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -228,7 +237,7 @@ class _RegistroPageState extends State<RegistroPage> {
                     _isLoading = false;
                   });
                 } else {
-                  if (_genero == 'Seleccione su género') {
+                  if (_option == "Seleccione su género") {
                     Scaffold.of(context).showSnackBar(SnackBar(
                         backgroundColor: Colors.red,
                         content: Text('Favor de seleccionar su género')));
@@ -269,6 +278,10 @@ class _RegistroPageState extends State<RegistroPage> {
                     });
                   }
                 }
+              }else{
+                setState(() {
+                  _isLoading = false;
+                });
               }
             }),
         SizedBox(width: 10.0),
@@ -299,11 +312,6 @@ class _RegistroPageState extends State<RegistroPage> {
   }
 
   void _registraUsuario() async {
-
-    _firebaseMessaging.getToken().then((token){
-      print(token);
-      _pref.token = token;
-    });
 
     return await dbReference.collection("Usuarios").document(_correo.toLowerCase()).setData({
       'Nombre': _nombre.toLowerCase(),
